@@ -1,0 +1,21 @@
+{
+  "name": "swiggy-clone",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "nodemon --exec ts-node src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.15.18",
+    "@types/nodemon": "^1.19.6",
+    "express": "^5.1.0",
+    "node": "^20.19.2",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
