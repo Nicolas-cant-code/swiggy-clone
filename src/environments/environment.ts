@@ -3,6 +3,14 @@ import { ProdEnvironment } from "./environment.prod";
 
 export interface Environment {
   db_url: string;
+  sendgrid: {
+    api_key?: string;
+    email_from?: string;
+  };
+  gmail_auth: {
+    user: string;
+    pass: string;
+  };
 }
 
 export function getEnvironmentVariables() {
