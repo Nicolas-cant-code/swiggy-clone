@@ -3,6 +3,7 @@ import { ProdEnvironment } from "./environment.prod";
 
 export interface Environment {
   db_url: string;
+  jwt_secret_key: string;
   sendgrid: {
     api_key?: string;
     email_from?: string;

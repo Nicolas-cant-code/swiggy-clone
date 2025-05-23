@@ -22,7 +22,6 @@ export class Server {
   }
 
   conigBodyParser() {
-    console.log("Configuring body parser");
     this.app.use(bodyParser.urlencoded({ extended: true }));
   }
 
@@ -42,7 +41,6 @@ export class Server {
   }
 
   setRoutes() {
-    console.log("Setting up routes");
     this.app.use("/api/user/", UserRouter);
   }
 
