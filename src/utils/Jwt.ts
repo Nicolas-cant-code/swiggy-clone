@@ -3,8 +3,13 @@ import { getEnvironmentVariables } from "../environments/environment";
 
 export class JWT {
   static jwtSign(payload) {
+    const p1 = {
+      // aud: id,
+    };
+
     return Jwt.sign(payload, getEnvironmentVariables().jwt_secret_key, {
       expiresIn: "1h",
+      issuer: "nicw.com",
     });
   }
 

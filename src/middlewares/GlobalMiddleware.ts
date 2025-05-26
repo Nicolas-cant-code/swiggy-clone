@@ -14,15 +14,19 @@ export class GlobalMiddleware {
 
   static async auth(req, res, next) {
     const header_auth = req.headers.authorization;
-    const token = header_auth ? header_auth.slice(7, header_auth.length) : null;
+    const token = header_auth.split(" ")[1];
 
     try {
-      req.errorStatus = 401;
+      if (!token) {
+        next(new Error("Correct token is required"));
+        req.errorStatus = 401;
+      }
       const decoded = await JWT.jwtVerify(token);
       req.user = decoded;
       next();
     } catch (error) {
-      next(error);
+      req.errorStatus = 401;
+      next(new Error("Correct token is required"));
     }
   }
 }

@@ -29,7 +29,7 @@ export class UserController {
     try {
       let user = await new User(data).save();
       const payload = {
-        uer_id: user._id,
+        aud: user._id,
         email: user.email,
         type: user.type,
       };
@@ -46,7 +46,7 @@ export class UserController {
     }
   }
 
-  static async verify(req, res, next) {
+  static async verifyUserEmailOTP(req, res, next) {
     const email = req.user.email;
     const verification_token = req.body.verification_token;
 
@@ -119,7 +119,7 @@ export class UserController {
     try {
       await Utils.comparePassword(data);
       const payload = {
-        user_id: user._id,
+        aud: user._id,
         email: user.email,
       };
       const token = JWT.jwtSign(payload);
@@ -163,12 +163,8 @@ export class UserController {
     }
   }
 
-  static async sendResetPasswordToken(req, res, next) {
-    try {
-      res.json({ success: true });
-    } catch (e) {
-      next(e);
-    }
+  static sendResetPasswordToken(req, res, next) {
+    res.json({ success: true });
   }
 
   static async resetPassword(req, res, next) {
@@ -177,8 +173,8 @@ export class UserController {
 
     try {
       const encrypt_password = await Utils.encryptPassword(new_password);
-      const updated_user = await User.findOneAndUpdate(
-        { _id: user._id },
+      const updated_user = await User.findByIdAndUpdate(
+        user._id,
         { updated_at: new Date(), password: encrypt_password },
         { new: true }
       );
@@ -187,6 +183,81 @@ export class UserController {
       } else {
         throw new Error("User does not exist");
       }
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async profile(req, res, next) {
+    const user = req.user;
+
+    try {
+      const profile = await User.findById(user.aud);
+      if (profile) {
+        res.send(profile);
+      } else {
+        throw new Error("User does not exist");
+      }
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async updatePhone(req, res, next) {
+    const phone = req.body.phone;
+    const user = req.user;
+
+    try {
+      const userData = await User.findById(
+        user.aud,
+        { phone: phone },
+        { new: true, updated_at: new Date() }
+      );
+      res.send(userData);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async updateUserProfile(req, res, next) {
+    const phone = req.body.phone;
+    const user = req.user;
+    const new_email = req.body.email;
+    const plain_password = req.body.password;
+    const verification_token = Utils.generateVerificationToken(6);
+
+    try {
+      const userData = await User.findById(user.aud);
+      if (!userData) throw new Error("User does not exist");
+      await Utils.comparePassword({
+        password: plain_password,
+        encrypt_password: userData.password,
+      });
+
+      const updatedData = await User.findByIdAndUpdate(
+        user.aud,
+        {
+          phone: phone,
+          email: new_email,
+          email_verified: false,
+          verification_token: Utils.generateVerificationToken(6),
+          verification_token_time: Date.now() + new Utils().MAX_UTILS_TIME,
+          updated_at: new Date(),
+        },
+        { new: true }
+      );
+      const payload = {
+        aud: user.aud,
+        email: updatedData.email,
+      };
+      const token = JWT.jwtSign(payload);
+      res.json({ user: user, token: token });
+
+      await NodeMailer.sendMail({
+        to: updatedData.email,
+        subject: "Verify your email",
+        html: `<h1>Your Otp is ${verification_token}</h1>`,
+      });
     } catch (e) {
       next(e);
     }

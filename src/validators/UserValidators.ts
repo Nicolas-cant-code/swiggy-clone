@@ -30,7 +30,7 @@ export class UserValidators {
     ];
   }
 
-  static verifyUser() {
+  static verifyUserEmailOTP() {
     return [
       body(
         "verification_token",
@@ -141,6 +141,37 @@ export class UserValidators {
             throw new Error("Reset password token is invalid");
           }
         }),
+    ];
+  }
+
+  static verifyPhone() {
+    return [body("phone", "Phone number is required").isString()];
+  }
+
+  static verifyUserProfile() {
+    return [
+      body("phone", "Phone number is required").isString(),
+      body("new_email", "Email is required")
+        .isEmail()
+        .custom((new_email, { req }) => {
+          if (req.user.email === new_email) {
+            throw "Please use a new unique email address.";
+          }
+          return User.findOne({
+            email: new_email,
+          })
+            .then((user) => {
+              if (user) {
+                throw "User with this email already exists";
+              } else {
+                return true;
+              }
+            })
+            .catch((err) => {
+              throw new Error(err);
+            });
+        }),
+      body("password", "Password is required").isAlphanumeric(),
     ];
   }
 }
