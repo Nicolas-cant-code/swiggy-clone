@@ -29,4 +29,13 @@ export class GlobalMiddleware {
       next(new Error("Correct token is required"));
     }
   }
+
+  static adminRole(req, res, next) {
+    const user = req.user;
+    if (user.type !== "admin") {
+      next(new Error("Unauthorized access"));
+      req.errorStatus = 401;
+    }
+    next();
+  }
 }

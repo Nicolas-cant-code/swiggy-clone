@@ -121,6 +121,7 @@ export class UserController {
       const payload = {
         aud: user._id,
         email: user.email,
+        type: user.type,
       };
       const token = JWT.jwtSign(payload);
       res.json({ user: user, token: token });
@@ -249,6 +250,7 @@ export class UserController {
       const payload = {
         aud: user.aud,
         email: updatedData.email,
+        type: updatedData.type,
       };
       const token = JWT.jwtSign(payload);
       res.json({ user: user, token: token });

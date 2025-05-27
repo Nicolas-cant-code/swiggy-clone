@@ -4,6 +4,7 @@ import { getEnvironmentVariables } from "./environments/environment";
 import UserRouter from "./routers/UserRouter";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
+import BannerRouter from "./routers/BannerRouter";
 
 export class Server {
   public app: express.Application = express();
@@ -41,7 +42,9 @@ export class Server {
   }
 
   setRoutes() {
+    this.app.use("/src/uploads/", express.static("src/uploads"));
     this.app.use("/api/user/", UserRouter);
+    this.app.use("/api/banner/", BannerRouter);
   }
 
   error404Handler() {
