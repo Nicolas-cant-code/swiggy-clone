@@ -6,7 +6,9 @@ import * as bodyParser from "body-parser";
 import * as cors from "cors";
 import BannerRouter from "./routers/BannerRouter";
 import CityRouter from "./routers/CityRouter";
-import ResterauntRouter from "./routers/ResterauntRouter";
+import CategoryRouter from "./routers/CategoryRouter";
+import RestaurantRouter from "./routers/RestaurantRouter";
+import ItemRouter from "./routers/ItemRouter";
 
 export class Server {
   public app: express.Application = express();
@@ -48,7 +50,9 @@ export class Server {
     this.app.use("/api/user/", UserRouter);
     this.app.use("/api/banner/", BannerRouter);
     this.app.use("/api/city/", CityRouter);
-    this.app.use("/api/resteraunt/", ResterauntRouter);
+    this.app.use("/api/restaurant/", RestaurantRouter);
+    this.app.use("/api/category/", CategoryRouter);
+    this.app.use("/api/item/", ItemRouter);
   }
 
   error404Handler() {

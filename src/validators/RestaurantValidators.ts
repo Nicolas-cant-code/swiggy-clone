@@ -1,8 +1,8 @@
 import { body, query } from "express-validator";
 import User from "../models/User";
 
-export class ResterauntValidators {
-  static addResteraunt() {
+export class RestaurantValidators {
+  static addRestaurant() {
     return [
       body("name", "Owner name is required").isString(),
       body("email", "Email is required")
@@ -26,7 +26,7 @@ export class ResterauntValidators {
         .isLength({ min: 6, max: 20 })
         .withMessage("Password must be between 6 and 20 characters"),
 
-      body("resterauntImages", "Cover image is required").custom(
+      body("restaurantImages", "Cover image is required").custom(
         (cover, { req }) => {
           if (req.file) {
             return true;
@@ -36,7 +36,7 @@ export class ResterauntValidators {
         }
       ),
 
-      body("res_name", "Resteraunt name is required").isString(),
+      body("res_name", "Restaurant name is required").isString(),
       body("short_name", "Short name is required").isString(),
       body("openTime", "Opeining time is required").isString(),
       body("closeTime", "Closing time is required").isString(),
@@ -50,7 +50,7 @@ export class ResterauntValidators {
     ];
   }
 
-  static getNearbyResteraunts() {
+  static getNearbyRestaurants() {
     return [
       query("Lat", "Latitude is required").isNumeric(),
       query("Lng", "Longitude is required").isNumeric(),
@@ -58,7 +58,7 @@ export class ResterauntValidators {
     ];
   }
 
-  static searchNearbyResteraunts() {
+  static searchNearbyRestaurants() {
     return [
       query("Lat", "Latitude is required").isNumeric(),
       query("Lng", "Longitude is required").isNumeric(),

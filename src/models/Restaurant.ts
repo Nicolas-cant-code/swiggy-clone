@@ -1,11 +1,11 @@
 import * as mongoose from "mongoose";
 import { model } from "mongoose";
 
-const resterauntSchema = new mongoose.Schema({
-  user_id: { type: mongoose.Types.ObjectId, required: true },
-  city_id: { type: mongoose.Types.ObjectId, required: true },
+const restaurantSchema = new mongoose.Schema({
+  user_id: { type: mongoose.Types.ObjectId, ref: "users", required: true },
+  city_id: { type: mongoose.Types.ObjectId, ref: "cities", required: true },
   name: { type: String, required: true },
-  short_name: { type: String, required: true },
+  // short_name: { type: String, required: true },
   description: { type: String },
   location: { type: Object, required: true },
   cuisines: { type: Array, required: true },
@@ -23,6 +23,6 @@ const resterauntSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now, required: true },
 });
 
-const Resteraunt = model("resteraunts", resterauntSchema);
+const Restaurant = model("resteraunts", restaurantSchema);
 
-export default Resteraunt;
+export default Restaurant;
