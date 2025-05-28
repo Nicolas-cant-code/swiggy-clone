@@ -29,7 +29,7 @@ class BannerRouter {
       "/create",
       GlobalMiddleware.auth,
       GlobalMiddleware.adminRole,
-      new Utils().multer.single("banner"),
+      new Utils().multer.single("bannerImages"),
       BannerValidators.createBanner(),
       GlobalMiddleware.checkError,
       BannerController.createBanner

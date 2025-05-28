@@ -13,20 +13,19 @@ export class UserController {
     const phone = req.body.phone;
     const verification_token = Utils.generateVerificationToken(6);
 
-    const hash = await Utils.encryptPassword(password);
-
-    const data = {
-      email,
-      verification_token,
-      verification_token_time: Date.now() + new Utils().MAX_UTILS_TIME,
-      phone,
-      password: hash,
-      name,
-      type,
-      status,
-    };
-
     try {
+      const hash = await Utils.encryptPassword(password);
+
+      const data = {
+        email,
+        verification_token,
+        verification_token_time: Date.now() + new Utils().MAX_UTILS_TIME,
+        phone,
+        password: hash,
+        name,
+        type,
+        status,
+      };
       let user = await new User(data).save();
       const payload = {
         aud: user._id,
