@@ -9,6 +9,9 @@ import CityRouter from "./routers/CityRouter";
 import CategoryRouter from "./routers/CategoryRouter";
 import RestaurantRouter from "./routers/RestaurantRouter";
 import ItemRouter from "./routers/ItemRouter";
+import AddressRouter from "./routers/AddressRouter";
+import OrderRouter from "./routers/OrderRouter";
+import { Utils } from "./utils/Utils";
 
 export class Server {
   public app: express.Application = express();
@@ -21,9 +24,14 @@ export class Server {
   }
 
   setConfigs() {
+    this.dotenvConfig();
     this.connectMongoDB();
     this.allowCors();
     this.conigBodyParser();
+  }
+
+  dotenvConfig() {
+    Utils.dotenvConfig();
   }
 
   conigBodyParser() {
@@ -53,6 +61,8 @@ export class Server {
     this.app.use("/api/restaurant/", RestaurantRouter);
     this.app.use("/api/category/", CategoryRouter);
     this.app.use("/api/item/", ItemRouter);
+    this.app.use("/api/address/", AddressRouter);
+    this.app.use("/api/order/", OrderRouter);
   }
 
   error404Handler() {

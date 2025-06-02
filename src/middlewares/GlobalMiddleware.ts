@@ -34,7 +34,7 @@ export class GlobalMiddleware {
     const user = req.user;
     if (user.type !== "admin") {
       next(new Error("Unauthorized access"));
-      req.errorStatus = 401;
+      // req.errorStatus = 401;
     }
     next();
   }

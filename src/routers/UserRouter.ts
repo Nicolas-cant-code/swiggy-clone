@@ -49,6 +49,12 @@ class UserRouter {
       GlobalMiddleware.checkError,
       UserController.signup
     );
+    this.router.post(
+      "/refresh/token",
+      UserValidators.checkRefreshToken(),
+      GlobalMiddleware.checkError,
+      UserController.checkRefreshToken
+    );
   }
 
   patchRoutes() {

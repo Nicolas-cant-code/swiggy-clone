@@ -4,7 +4,11 @@ export class BannerController {
   static async createBanner(req, res, next) {
     const path = req.file.path;
     try {
-      const data = { banner: path };
+      let data = {
+        banner: path,
+        restaurant_id: req.body.restaurant_id || null,
+      };
+
       let banner = await new Banner(data).save();
       res.send(banner);
     } catch (e) {

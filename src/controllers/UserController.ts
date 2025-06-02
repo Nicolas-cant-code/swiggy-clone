@@ -2,6 +2,7 @@ import User from "../models/User";
 import { Utils } from "../utils/Utils";
 import { NodeMailer } from "../utils/NodeMailer";
 import { JWT } from "../utils/Jwt";
+import { ref } from "process";
 
 export class UserController {
   static async signup(req, res, next) {
@@ -28,12 +29,17 @@ export class UserController {
       };
       let user = await new User(data).save();
       const payload = {
-        aud: user._id,
+        // aud: user._id,
         email: user.email,
         type: user.type,
       };
-      const token = JWT.jwtSign(payload);
-      res.json({ user: user, token: token });
+      const access_token = JWT.jwtSign(payload, user._id);
+      const refresh_token = JWT.jwtSignRefreshToken(payload, user._id);
+      res.json({
+        user: user,
+        token: access_token,
+        refresh_token: refresh_token,
+      });
 
       await NodeMailer.sendMail({
         to: email,
@@ -122,8 +128,13 @@ export class UserController {
         email: user.email,
         type: user.type,
       };
-      const token = JWT.jwtSign(payload);
-      res.json({ user: user, token: token });
+      const access_token = JWT.jwtSign(payload, user._id);
+      const refresh_token = JWT.jwtSignRefreshToken(payload, user._id);
+      res.json({
+        user: user,
+        token: access_token,
+        refresh_token: refresh_token,
+      });
     } catch (err) {
       next(err);
     }
@@ -247,12 +258,17 @@ export class UserController {
         { new: true }
       );
       const payload = {
-        aud: user.aud,
+        // aud: user.aud,
         email: updatedData.email,
         type: updatedData.type,
       };
-      const token = JWT.jwtSign(payload);
-      res.json({ user: user, token: token });
+      const access_token = JWT.jwtSign(payload, user.aud);
+      const refresh_token = JWT.jwtSignRefreshToken(payload, user.aud);
+      res.json({
+        user: user,
+        token: access_token,
+        refresh_token: refresh_token,
+      });
 
       await NodeMailer.sendMail({
         to: updatedData.email,
@@ -260,6 +276,38 @@ export class UserController {
         html: `<h1>Your Otp is ${verification_token}</h1>`,
       });
     } catch (e) {
+      next(e);
+    }
+  }
+
+  static async checkRefreshToken(req, res, next) {
+    const refreshToken = req.query.refresh_token;
+    const user = req.user;
+
+    try {
+      const decoded_data = await JWT.jwtVerifyRefreshToken(refreshToken);
+      if (decoded_data) {
+        const payload = {
+          // aud: user._id,
+          email: user.email,
+          type: user.type,
+        };
+        const access_token = JWT.jwtSign(payload, decoded_data.aud);
+        const refresh_token = JWT.jwtSignRefreshToken(
+          payload,
+          decoded_data.aud
+        );
+        res.json({
+          user: user,
+          accessToken: access_token,
+          refresh_token: refresh_token,
+        });
+      } else {
+        req.errorStatus = 403;
+        throw new Error("Access is Forbiden");
+      }
+    } catch (e) {
+      req.errorStatus = 403;
       next(e);
     }
   }

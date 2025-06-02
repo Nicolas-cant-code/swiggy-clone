@@ -1,17 +1,21 @@
+import { Utils } from "../utils/Utils";
 import { Environment } from "./environment";
 
+Utils.dotenvConfig();
+
 export const DevEnvironment: Environment = {
-  db_url:
-    "mongodb+srv://nicw103:17Ants17@zaioappclone.jakbqev.mongodb.net/zaioAppClone",
-  jwt_secret_key: "secret_key",
+  db_url: process.env.DEV_DB_URL,
+
+  jwt_secret_key: process.env.DEV_JWT_SECRET_KEY,
+  jwt_refresh_secret_key: process.env.DEV_JWT_REFRESH_SECRET_KEY,
+
   sendgrid: {
-    api_key:
-      "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",
-    email_from: "nicw103@gmail.com",
+    api_key: process.env.DEV_SENDGRID_API_KEY,
+    email_from: process.env.DEV_EMAIL_FROM,
   },
 
   gmail_auth: {
-    user: "",
-    pass: "",
+    user: process.env.DEV_GMAIL_AUTH_USER,
+    pass: process.env.DEV_GMAIL_AUTH_PASS,
   },
 };

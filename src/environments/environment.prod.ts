@@ -1,16 +1,20 @@
+import { Utils } from "../utils/Utils";
 import { Environment } from "./environment";
 
+Utils.dotenvConfig();
+
 export const ProdEnvironment: Environment = {
-  db_url:
-    "mongodb+srv://nicw103:17Ants17@zaioappclone.jakbqev.mongodb.net/zaioAppClone",
-  jwt_secret_key: "secret_key_production",
+  db_url: process.env.PROD_DB_URL,
+
+  jwt_secret_key: process.env.PROD_JWT_SECRET_KEY,
+  jwt_refresh_secret_key: process.env.PROD_JWT_REFRESH_SECRET_KEY,
+
   sendgrid: {
-    api_key:
-      "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",
-    email_from: "nicw103@gmail.com",
+    api_key: process.env.PROD_SENDGRID_API_KEY,
+    email_from: process.env.PROD_EMAIL_FROM,
   },
   gmail_auth: {
-    user: "",
-    pass: "",
+    user: process.env.PROD_GMAIL_AUTH_USER,
+    pass: process.env.PROD_GMAIL_AUTH_PASS,
   },
 };

@@ -174,4 +174,19 @@ export class UserValidators {
       body("password", "Password is required").isAlphanumeric(),
     ];
   }
+
+  static checkRefreshToken() {
+    return [
+      body("refresh_token", "Refresh token is required")
+        .isString()
+        .custom((refresh_token, { req }) => {
+          if (refresh_token) {
+            return true;
+          } else {
+            req.errorStatus = 403;
+            throw "Access is Forbiden";
+          }
+        }),
+    ];
+  }
 }

@@ -55,8 +55,13 @@ export class RestaurantController {
   }
 
   static async getNearbyRestaurants(req, res, next) {
+    const perPage = 10;
+    const currentPage = parseInt(req.query.page) || 1;
+    const prevPage = currentPage - 1;
+    let nextPage = currentPage + 1;
+
     try {
-      const restaurants = await Restaurant.find({
+      const restaurants_doc_count = await Restaurant.countDocuments({
         status: "active",
         location: {
           $geoWithin: {
@@ -67,14 +72,67 @@ export class RestaurantController {
           },
         },
       });
-      res.send(restaurants);
+      const totalPages = Math.ceil(restaurants_doc_count / perPage);
+      if (currentPage > totalPages) {
+        throw new Error("No more Restaurants to show");
+      }
+      if (totalPages === 0 || totalPages === currentPage) {
+        nextPage = null;
+      }
+
+      const restaurants = await Restaurant.find({
+        status: "active",
+        location: {
+          $geoWithin: {
+            $centerSphere: [
+              [parseFloat(req.query.Lng), parseFloat(req.query.Lat)],
+              parseFloat(req.query.radius) / 6378.1,
+            ],
+          },
+        },
+      })
+        .skip(perPage * currentPage - perPage)
+        .limit(perPage);
+      res.json({
+        restaurants,
+        perPage,
+        currentPage,
+        nextPage,
+        prevPage,
+        totalPages,
+      });
     } catch (e) {
       next(e);
     }
   }
 
   static async searchNearbyRestaurants(req, res, next) {
+    const perPage = 10;
+    const currentPage = parseInt(req.query.page) || 1;
+    const prevPage = currentPage - 1;
+    let nextPage = currentPage + 1;
+
     try {
+      const restaurants_doc_count = await Restaurant.countDocuments({
+        status: "active",
+        name: { $regex: req.query.name, $options: "i" },
+        location: {
+          $geoWithin: {
+            $centerSphere: [
+              [parseFloat(req.query.Lng), parseFloat(req.query.Lat)],
+              parseFloat(req.query.radius) / 6378.1,
+            ],
+          },
+        },
+      });
+      const totalPages = Math.ceil(restaurants_doc_count / perPage);
+      if (currentPage > totalPages) {
+        throw new Error("No more Restaurants to show");
+      }
+      if (totalPages === 0 || totalPages === currentPage) {
+        nextPage = null;
+      }
+
       const restaurants = await Restaurant.find({
         status: "active",
         name: { $regex: req.query.name, $options: "i" },
@@ -86,6 +144,16 @@ export class RestaurantController {
             ],
           },
         },
+      })
+        .skip(perPage * currentPage - perPage)
+        .limit(perPage);
+      res.json({
+        restaurants,
+        perPage,
+        currentPage,
+        nextPage,
+        prevPage,
+        totalPages,
       });
       res.send(restaurants);
     } catch (e) {
