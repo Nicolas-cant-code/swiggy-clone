@@ -49,6 +49,18 @@ export class OrderController {
     let nextPage = currentPage + 1;
     try {
       const orders_doc_count = await Order.countDocuments({ user_id: user_id });
+
+      if (!orders_doc_count) {
+        res.json({
+          orders: [],
+          perPage,
+          currentPage,
+          nextPage: null,
+          prevPage,
+          totalPages: 0,
+        });
+      }
+
       const totalPages = Math.ceil(orders_doc_count / perPage);
       if (currentPage > totalPages) {
         throw new Error("No more Orders to show");

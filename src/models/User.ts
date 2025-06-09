@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   reset_password_verification_token: { type: String, required: false },
   reset_password_verification_token_time: { type: Date, required: false },
   name: { type: String, required: true },
+  profile_pic: { type: String, required: false },
   type: { type: String, required: true },
   status: { type: String, required: true },
   phone: { type: String, required: true },

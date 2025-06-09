@@ -30,6 +30,23 @@ export class GlobalMiddleware {
     }
   }
 
+  static async decodeRefreshToken(req, res, next) {
+    const refreshToken = req.body.refresh_token;
+
+    try {
+      if (!refreshToken) {
+        req.errorStatus = 403;
+        next(new Error("Access is Forbiden. User doesn't exist"));
+      }
+      const decoded = await JWT.jwtVerifyRefreshToken(refreshToken);
+      req.user = decoded;
+      next();
+    } catch (error) {
+      req.errorStatus = 401;
+      next(new Error("Your Session is expired. Please log in again"));
+    }
+  }
+
   static adminRole(req, res, next) {
     const user = req.user;
     if (user.type !== "admin") {

@@ -1,6 +1,8 @@
 import * as Jwt from "jsonwebtoken";
 import { getEnvironmentVariables } from "../environments/environment";
 import * as Crypto from "crypto";
+import { Redis } from "./Redis";
+import { ref } from "process";
 
 export class JWT {
   static jwtSign(payload, userId) {
@@ -30,12 +32,27 @@ export class JWT {
     });
   }
 
-  static jwtSignRefreshToken(payload, userId) {
-    return Jwt.sign(payload, getEnvironmentVariables().jwt_refresh_secret_key, {
-      expiresIn: "180d",
-      audience: userId.toString(),
-      issuer: "nicw.com",
-    });
+  static async jwtSignRefreshToken(
+    payload,
+    userId,
+    redis_ex: number = 60 * 60 * 24 * 180 // 180 days in seconds
+  ) {
+    try {
+      const refresh_token = Jwt.sign(
+        payload,
+        getEnvironmentVariables().jwt_refresh_secret_key,
+        {
+          expiresIn: "180d",
+          audience: userId.toString(),
+          issuer: "nicw.com",
+        }
+      );
+      // set refresh token in redis
+      await Redis.setValue(userId.toString(), refresh_token, redis_ex);
+      return refresh_token;
+    } catch (error) {
+      throw error;
+    }
   }
 
   static jwtVerifyRefreshToken(token: string): Promise<any> {
@@ -49,6 +66,17 @@ export class JWT {
           } else if (!decoded) {
             reject(new Error("User is not Authorized"));
           } else {
+            // get tokens to match in redis db
+            const user: any = decoded;
+            Redis.getValue(user.aud)
+              .then((value) => {
+                if (value === token) {
+                  resolve(decoded);
+                }
+              })
+              .catch((e) => {
+                reject(e);
+              });
             resolve(decoded);
           }
         }

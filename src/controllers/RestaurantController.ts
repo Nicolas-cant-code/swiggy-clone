@@ -72,6 +72,16 @@ export class RestaurantController {
           },
         },
       });
+      if (!restaurants_doc_count) {
+        res.json({
+          restaurants: [],
+          perPage,
+          currentPage,
+          nextPage: null,
+          prevPage,
+          totalPages: 0,
+        });
+      }
       const totalPages = Math.ceil(restaurants_doc_count / perPage);
       if (currentPage > totalPages) {
         throw new Error("No more Restaurants to show");
@@ -107,6 +117,7 @@ export class RestaurantController {
   }
 
   static async searchNearbyRestaurants(req, res, next) {
+    const EARTH_RADIUS_KM = 6378.1;
     const perPage = 10;
     const currentPage = parseInt(req.query.page) || 1;
     const prevPage = currentPage - 1;
@@ -117,14 +128,28 @@ export class RestaurantController {
         status: "active",
         name: { $regex: req.query.name, $options: "i" },
         location: {
-          $geoWithin: {
-            $centerSphere: [
-              [parseFloat(req.query.Lng), parseFloat(req.query.Lat)],
-              parseFloat(req.query.radius) / 6378.1,
-            ],
+          $nearSphere: {
+            $geometry: {
+              type: "Point",
+              coordinates: [
+                parseFloat(req.query.Lng),
+                parseFloat(req.query.Lat),
+              ],
+            },
+            $maxDistance: parseFloat(req.query.radius) * EARTH_RADIUS_KM,
           },
         },
       });
+      if (!restaurants_doc_count) {
+        res.json({
+          restaurants: [],
+          perPage,
+          currentPage,
+          nextPage: null,
+          prevPage,
+          totalPages: 0,
+        });
+      }
       const totalPages = Math.ceil(restaurants_doc_count / perPage);
       if (currentPage > totalPages) {
         throw new Error("No more Restaurants to show");
@@ -137,11 +162,15 @@ export class RestaurantController {
         status: "active",
         name: { $regex: req.query.name, $options: "i" },
         location: {
-          $geoWithin: {
-            $centerSphere: [
-              [parseFloat(req.query.Lng), parseFloat(req.query.Lat)],
-              parseFloat(req.query.radius) / 6378.1,
-            ],
+          $nearSphere: {
+            $geometry: {
+              type: "Point",
+              coordinates: [
+                parseFloat(req.query.Lng),
+                parseFloat(req.query.Lat),
+              ],
+            },
+            $maxDistance: parseFloat(req.query.radius) * EARTH_RADIUS_KM,
           },
         },
       })

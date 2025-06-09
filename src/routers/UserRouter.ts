@@ -2,6 +2,7 @@ import { Router } from "express";
 import { UserController } from "../controllers/UserController";
 import { UserValidators } from "../validators/UserValidators";
 import { GlobalMiddleware } from "../middlewares/GlobalMiddleware";
+import { Utils } from "../utils/Utils";
 
 class UserRouter {
   public router: Router;
@@ -51,9 +52,15 @@ class UserRouter {
     );
     this.router.post(
       "/refresh/token",
-      UserValidators.checkRefreshToken(),
+      GlobalMiddleware.decodeRefreshToken,
       GlobalMiddleware.checkError,
       UserController.checkRefreshToken
+    );
+    this.router.post(
+      "/logout",
+      GlobalMiddleware.auth,
+      GlobalMiddleware.decodeRefreshToken,
+      UserController.logout
     );
   }
 
@@ -87,7 +94,16 @@ class UserRouter {
     );
   }
 
-  putRoutes() {}
+  putRoutes() {
+    this.router.put(
+      "/update/profilePic",
+      GlobalMiddleware.auth,
+      new Utils().multer.single("profileImages"),
+      UserValidators.userProfilePic(),
+      GlobalMiddleware.checkError,
+      UserController.updateUserProfilePic
+    );
+  }
 
   deleteRoutes() {}
 }

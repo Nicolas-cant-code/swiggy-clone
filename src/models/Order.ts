@@ -13,7 +13,11 @@ const orderSchema = new mongoose.Schema({
   deliveryCharge: { type: Number, required: true },
   payment_status: { type: Boolean, required: true },
   payment_mode: { type: String, required: true },
-  created_at: { type: Date, default: Date.now, required: true },
+  created_at: {
+    type: Date,
+    default: new Date(),
+    required: true,
+  },
   updated_at: { type: Date, default: Date.now, required: true },
 });
 

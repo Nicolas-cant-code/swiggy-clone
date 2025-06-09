@@ -17,4 +17,10 @@ export const ProdEnvironment: Environment = {
     user: process.env.PROD_GMAIL_AUTH_USER,
     pass: process.env.PROD_GMAIL_AUTH_PASS,
   },
+  redis: {
+    username: process.env.SERVER_REDIS_USERNAME,
+    password: process.env.SERVER_REDIS_PASSWORD,
+    host: process.env.SERVER_REDIS_HOST,
+    port: parseInt(process.env.SERVER_REDIS_PORT),
+  },
 };

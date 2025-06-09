@@ -12,6 +12,7 @@ import ItemRouter from "./routers/ItemRouter";
 import AddressRouter from "./routers/AddressRouter";
 import OrderRouter from "./routers/OrderRouter";
 import { Utils } from "./utils/Utils";
+import { Redis } from "./utils/Redis";
 
 export class Server {
   public app: express.Application = express();
@@ -26,16 +27,13 @@ export class Server {
   setConfigs() {
     this.dotenvConfig();
     this.connectMongoDB();
+    this.connectRedis();
     this.allowCors();
     this.conigBodyParser();
   }
 
   dotenvConfig() {
     Utils.dotenvConfig();
-  }
-
-  conigBodyParser() {
-    this.app.use(bodyParser.urlencoded({ extended: true }));
   }
 
   connectMongoDB() {
@@ -47,6 +45,14 @@ export class Server {
         console.log("Connected to MongoDB");
       })
       .catch((error) => console.log("Error connecting to Database:")); //, error));
+  }
+
+  connectRedis() {
+    Redis.connectToRedis();
+  }
+
+  conigBodyParser() {
+    this.app.use(bodyParser.urlencoded({ extended: true }));
   }
 
   allowCors() {

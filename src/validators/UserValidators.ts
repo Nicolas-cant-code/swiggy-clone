@@ -46,8 +46,12 @@ export class UserValidators {
           return User.findOne({ email: email })
             .then((user) => {
               if (user) {
-                req.user = user;
-                return true;
+                if (user.type == "user" || user.type == "admin") {
+                  req.user = user;
+                  return true;
+                } else {
+                  throw "You are not an authorized user";
+                }
               } else {
                 throw "User doesn't exist";
               }
@@ -175,18 +179,32 @@ export class UserValidators {
     ];
   }
 
-  static checkRefreshToken() {
+  // static checkRefreshToken() {
+  //   return [
+  //     body("refresh_token", "Refresh token is required")
+  //       .isString()
+  //       .custom((refresh_token, { req }) => {
+  //         if (refresh_token) {
+  //           return true;
+  //         } else {
+  //           req.errorStatus = 403;
+  //           throw "Access is Forbiden";
+  //         }
+  //       }),
+  //   ];
+  // }
+
+  static userProfilePic() {
     return [
-      body("refresh_token", "Refresh token is required")
-        .isString()
-        .custom((refresh_token, { req }) => {
-          if (refresh_token) {
+      body("profileImages", "Profile image is required").custom(
+        (profileImage, { req }) => {
+          if (req.file) {
             return true;
           } else {
-            req.errorStatus = 403;
-            throw "Access is Forbiden";
+            throw new Error("Profile image not uploaded");
           }
-        }),
+        }
+      ),
     ];
   }
 }
